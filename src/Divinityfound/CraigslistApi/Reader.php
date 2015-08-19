@@ -20,7 +20,7 @@
 	        preg_match_all($pattern, $contents, $matches, PREG_SET_ORDER);
 	        foreach ($matches as $key => $match) {
 	        	$explode = explode('"', $this->sanitize($match[0]));
-	        	$url = $explode[7];
+	        	$url = str_replace('//', '', $explode[7]);
 		        if (strpos($url, 'craigslist') === false) {
 		            $url = $city.".craigslist.org".$url;
 		        }
