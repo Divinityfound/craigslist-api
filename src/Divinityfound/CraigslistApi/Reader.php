@@ -18,16 +18,24 @@
 	    	$cleaned_results = array();
 	    	$pattern = "<span class=\x22pl\x22\>(.+?)\<\/span>";
 	        preg_match_all($pattern, $contents, $matches, PREG_SET_ORDER);
+
 	        foreach ($matches as $key => $match) {
 	        	$explode = explode('"', $this->sanitize($match[0]));
 	        	$url = str_replace('//', '', $explode[7]);
 		        if (strpos($url, 'craigslist') === false) {
 		            $url = $city.".craigslist.org".$url;
 		        }
+
+		        if ($explode[12] != 'span id=') {
+		        	$title = str_replace('/a /span', '', $explode[12]);
+		        }  else {
+		        	$title = $explode[14];
+		        }
+
 		        $clean_array = array(
 	        			'submission' => $explode[5],
 	        			'url'		 => $url,
-	        			'title'		 => str_replace('/a /span', '', $explode[12])
+	        			'title'		 => $title
 		        	);
 	        	array_push($cleaned_results, $clean_array);
 	        }
