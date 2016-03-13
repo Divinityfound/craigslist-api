@@ -29,7 +29,7 @@
 		        if ($explode[12] != 'span id=') {
 		        	$title = str_replace('/a /span', '', $explode[12]);
 		        }  else {
-		        	$title = $explode[14];
+		        	$title = str_replace('/span', '', $explode[14]);
 		        }
 
 		        $clean_array = array(
