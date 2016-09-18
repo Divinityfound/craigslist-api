@@ -30,15 +30,18 @@
 
 	    		if (isset($cleanRows[25])) {
 		    		$submission = $cleanRows[18];
-		    		$url = 'http://'.$city.'.craigslist.org'.$cleanRows[2];
+		    		$url = $city.'.craigslist.org'.$cleanRows[2];
 	    			$title = $cleanRows[25];
 	    		} else if (isset($cleanRows[27])) {
+	    			if (!isset($cleanRows[20])) {
+	    				continue;
+	    			}
 	    			$submission = $cleanRows[20];
-		    		$url = 'http://'.$city.'.craigslist.org'.$cleanRows[4];
+		    		$url = $city.'.craigslist.org'.$cleanRows[4];
 	    			$title = $cleanRows[27];
 	    		} else {
 	    			$submission = $cleanRows[20];
-		    		$url = 'http://'.$city.'.craigslist.org'.$cleanRows[4];
+		    		$url = $city.'.craigslist.org'.$cleanRows[4];
 	    			$title = $cleanRows[29];
 	    		}
 
