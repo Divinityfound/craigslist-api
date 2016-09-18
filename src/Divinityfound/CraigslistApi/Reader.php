@@ -8,6 +8,9 @@
 	        $contents = null;
 	        $url = $url_main = "http://".$city.".craigslist.org/search/".$category."/";
 	        $contents = $this->ReadPage($url);
+	        $contents = explode('<div class="rows">', $contents)[1];
+	        $contents = explode('close fullscreen', $contents)[0];
+
 
 	        $cleaned_results = $this->withdate($contents,$city);
 	        
@@ -16,29 +19,36 @@
 
 	    private function withdate($contents,$city) {
 	    	$cleaned_results = array();
-	    	$pattern = "<span class=\x22pl\x22\>(.+?)\<\/span>";
-	        preg_match_all($pattern, $contents, $matches, PREG_SET_ORDER);
+	    	
+	    	$rows = explode('<p class="row" data-pid="', $contents);
 
-	        foreach ($matches as $key => $match) {
-	        	$explode = explode('"', $this->sanitize($match[0]));
-	        	$url = str_replace('//', '', $explode[7]);
-		        if (strpos($url, 'craigslist') === false) {
-		            $url = $city.".craigslist.org".$url;
-		        }
+	    	foreach ($rows as $key => $row) {
+	    		if (strpos($row, '<') === false) {
+	    			continue;
+	    		}
+	    		$cleanRows = array_unique(array_filter($this->sanitize(explode('"',$row))));
 
-		        if ($explode[12] != 'span id=') {
-		        	$title = str_replace('/a /span', '', $explode[12]);
-		        }  else {
-		        	$title = str_replace('/span', '', $explode[14]);
-		        }
+	    		if (isset($cleanRows[25])) {
+		    		$submission = $cleanRows[18];
+		    		$url = 'http://'.$city.'.craigslist.org'.$cleanRows[2];
+	    			$title = $cleanRows[25];
+	    		} else if (isset($cleanRows[27])) {
+	    			$submission = $cleanRows[20];
+		    		$url = 'http://'.$city.'.craigslist.org'.$cleanRows[4];
+	    			$title = $cleanRows[27];
+	    		} else {
+	    			$submission = $cleanRows[20];
+		    		$url = 'http://'.$city.'.craigslist.org'.$cleanRows[4];
+	    			$title = $cleanRows[29];
+	    		}
 
-		        $clean_array = array(
-	        			'submission' => $explode[5],
+	    		$clean_array = array(
+	        			'submission' => $submission,
 	        			'url'		 => $url,
 	        			'title'		 => $title
 		        	);
 	        	array_push($cleaned_results, $clean_array);
-	        }
+	    	}
 	        return $cleaned_results;
 	    }
 
@@ -46,6 +56,17 @@
 	    	$data = str_replace('<', '', $data);
 	    	$data = str_replace('>', '', $data);
 	    	$data = str_replace('//', '', $data);
+	    	$data = str_replace('a href=', '', $data);
+	    	$data = str_replace('/a', '', $data);
+	    	$data = str_replace('/span', '', $data);
+	    	$data = str_replace('span class=', '', $data);
+	    	$data = str_replace('  ', '', $data);
+
+	    	foreach($data as $key => $one) {
+			    if(strpos($one, '=') !== false)
+			        unset($data[$key]);
+			}
+	    	
 	    	return $data;
 	    }
 
